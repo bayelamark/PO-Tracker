@@ -2,6 +2,8 @@ const searchInput = document.querySelector("#searchInput");
 const searchButton = document.querySelector("#searchButton");
 const cardResults = document.querySelector(".card-results");
 
+let currentCards = [];
+
 searchButton.addEventListener("click", searchCards);
 
 searchInput.addEventListener("keydown", function (event) {
@@ -85,6 +87,8 @@ async function fetchAllCards(cardName) {
 }
 
 function displayCards(cards, searchTerm) {
+  currentCards = cards;
+  
   if (cards.length === 0) {
     cardResults.innerHTML = `
       <h2>Card Results</h2>
@@ -219,4 +223,56 @@ function escapeHTML(value) {
   return String(value).replace(/[&<>"']/g, function (character) {
     return characters[character];
   });
+}
+
+cardResults.addEventListener("click", function (event) {
+  if (!event.target.classList.contains("collection-button")) {
+    return;
+  }
+
+  const cardId = event.target.dataset.cardId;
+  addToCollection(cardId, event.target);
+});
+
+function addToCollection(cardId, button) {
+  const selectedCard = currentCards.find(function (card) {
+    return card.id === cardId;
+  });
+
+  if (!selectedCard) {
+    return;
+  }
+
+  const savedCollection =
+    JSON.parse(localStorage.getItem("poTrackerCollection")) || [];
+
+  const alreadySaved = savedCollection.some(function (card) {
+    return card.id === selectedCard.id;
+  });
+
+  if (alreadySaved) {
+    button.textContent = "Already in Collection";
+    return;
+  }
+
+  const cardToSave = {
+    id: selectedCard.id,
+    name: selectedCard.name,
+    image: selectedCard.images.small,
+    setName: selectedCard.set.name,
+    rarity: selectedCard.rarity ?? "Not listed",
+    number: selectedCard.number,
+    setTotal: selectedCard.set.printedTotal,
+    marketPrice: getMarketPrice(selectedCard)
+  };
+
+  savedCollection.push(cardToSave);
+
+  localStorage.setItem(
+    "poTrackerCollection",
+    JSON.stringify(savedCollection)
+  );
+
+  button.textContent = "Added to Collection";
+  button.disabled = true;
 }
