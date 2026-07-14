@@ -4,6 +4,8 @@ const cardResults = document.querySelector(".card-results");
 
 let currentCards = [];
 
+loadNewCards();
+
 searchButton.addEventListener("click", searchCards);
 
 searchInput.addEventListener("keydown", function (event) {
@@ -157,8 +159,13 @@ function displayCards(cards, searchTerm) {
     `;
   }).join("");
 
-  cardResults.innerHTML = `
-    <h2>${cards.length} results for “${escapeHTML(searchTerm)}”</h2>
+  const heading =
+  searchTerm === "New & Noteworthy"
+    ? "New & Noteworthy"
+    : `${cards.length} results for “${escapeHTML(searchTerm)}”`;
+
+cardResults.innerHTML = `
+  <h2>${heading}</h2>
 
     <div class="card-grid">
       ${cardHTML}
@@ -209,6 +216,33 @@ function getAvailableFinishes(card) {
   return finishes.length > 0
     ? finishes.join(" • ")
     : "Not listed";
+}
+async function loadNewCards() {
+  cardResults.innerHTML = `
+    <h2>New & Noteworthy</h2>
+    <p>Loading recently released cards...</p>
+  `;
+
+  try {
+    const response = await fetch(
+      "https://api.pokemontcg.io/v2/cards?pageSize=20&orderBy=-set.releaseDate"
+    );
+
+    if (!response.ok) {
+      throw new Error("Unable to load new cards.");
+    }
+
+    const result = await response.json();
+
+    displayCards(result.data, "New & Noteworthy");
+  } catch (error) {
+    cardResults.innerHTML = `
+      <h2>New & Noteworthy</h2>
+      <p>There was a problem loading the newest cards.</p>
+    `;
+
+    console.error(error);
+  }
 }
 
 function escapeHTML(value) {
