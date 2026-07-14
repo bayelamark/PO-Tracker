@@ -174,19 +174,19 @@ cardResults.innerHTML = `
 }
 
 function getMarketPrice(card) {
-  const prices = card.tcgplayer?.prices ?? {};
+  const prices = card.tcgplayer?.prices;
 
-  const availablePrices = [
-    prices.holofoil?.market,
-    prices.normal?.market,
-    prices.reverseHolofoil?.market,
-    prices["1stEditionHolofoil"]?.market,
-    prices["1stEditionNormal"]?.market
-  ];
+  if (!prices) {
+    return undefined;
+  }
 
-  return availablePrices.find(function (price) {
-    return typeof price === "number";
+  const priceTypes = Object.values(prices);
+
+  const marketPrice = priceTypes.find(function (priceType) {
+    return typeof priceType?.market === "number";
   });
+
+  return marketPrice?.market;
 }
 
 function getAvailableFinishes(card) {
