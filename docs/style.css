@@ -371,3 +371,12 @@ header {
 main {
   padding-top: 20px;
 }
+
+.profile-box {
+  width: min(600px, calc(100% - 40px));
+  margin: 30px auto;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+}
