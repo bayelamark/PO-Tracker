@@ -140,6 +140,14 @@ function displayCards(cards, searchTerm) {
               ? `Market Price: $${price.toFixed(2)}`
               : "Market Price: Not available"}
           </p>
+          
+          <button
+            class="collection-button"
+            type="button"
+            data-card-id="${card.id}"
+          >
+            Add to Collection
+          </button>
         </div>
       </article>
     `;
