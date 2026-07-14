@@ -225,7 +225,7 @@ async function loadNewCards() {
 
   try {
     const response = await fetch(
-      "https://api.pokemontcg.io/v2/cards?pageSize=20&orderBy=-set.releaseDate"
+      "https://api.pokemontcg.io/v2/cards?page=1&pageSize=20&orderBy=-set.releaseDate"
     );
 
     if (!response.ok) {
@@ -238,7 +238,7 @@ async function loadNewCards() {
   } catch (error) {
     cardResults.innerHTML = `
       <h2>New & Noteworthy</h2>
-      <p>There was a problem loading the newest cards.</p>
+      <p>There was a problem loading the newest cards: ${escapeHTML(error.message)}</p>
     `;
 
     console.error(error);
