@@ -1,4 +1,4 @@
-<img src="client/PO%20Tracker%20White.png"
+<img src="client/PO-Tracker-White.png"
      alt="PO Tracker Logo"
      width="700">
 
