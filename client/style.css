@@ -14,3 +14,7 @@ h1 {
 p {
   font-size: 20px;
 }
+.logo {
+  width: 300px;
+  margin-top: 60px;
+}
