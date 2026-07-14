@@ -1,5 +1,55 @@
-<nav class="main-nav">
-  <a href="index.html">My Collection</a>
-  <a href="search.html">Search</a>
-  <a href="profile.html">Profile</a>
-</nav>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search | PO Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <img
+      src="PO-Tracker-White.png"
+      alt="PO Tracker logo"
+      class="logo"
+    >
+
+    <nav class="main-nav">
+      <a href="index.html">My Collection</a>
+      <a href="search.html">Search</a>
+      <a href="profile.html">Profile</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Track Pokémon Card Prices</h1>
+
+    <p>
+      Search for a Pokémon card to view its information and market price.
+    </p>
+
+    <div class="search-box">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Enter a card name"
+      >
+
+      <button id="searchButton" type="button">
+        Search
+      </button>
+    </div>
+
+    <section class="card-results">
+      <h2>Card Results</h2>
+
+      <p id="resultsMessage">
+        Your search results will appear here.
+      </p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
