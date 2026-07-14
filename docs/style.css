@@ -312,3 +312,9 @@ p {
 .collection-button:hover {
   opacity: 0.88;
 }
+
+.collection-button:disabled {
+  background-color: #4b5563;
+  cursor: default;
+  opacity: 0.8;
+}
