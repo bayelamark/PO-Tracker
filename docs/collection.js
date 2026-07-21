@@ -179,7 +179,17 @@ function displayCollection(cards) {
     `;
     return;
   }
+  
+const totalValue = cards.reduce(function (total, card) {
+  const currentPrice = getCurrentPrice(card);
 
+  return total + (
+    typeof currentPrice === "number"
+      ? currentPrice
+      : 0
+  );
+}, 0);
+  
   const cardHTML = cards.map(function (card) {
     const currentPrice = getCurrentPrice(card);
 
@@ -227,13 +237,25 @@ function displayCollection(cards) {
     `;
   }).join("");
 
-  collectionResults.innerHTML = `
-    <h2>${cards.length} Cards</h2>
-
-    <div class="card-grid">
-      ${cardHTML}
+ collectionResults.innerHTML = `
+  <div class="collection-summary">
+    <div class="summary-item">
+      <span>Total Cards</span>
+      <strong>${cards.length}</strong>
     </div>
-  `;
+
+    <div class="summary-item">
+      <span>Estimated Value</span>
+      <strong>$${totalValue.toFixed(2)}</strong>
+    </div>
+  </div>
+
+  <h2>My Cards</h2>
+
+  <div class="card-grid">
+    ${cardHTML}
+  </div>
+`;
 }
 
 collectionResults.addEventListener("click", function (event) {
