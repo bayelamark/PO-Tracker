@@ -177,12 +177,12 @@ async function updatePrices() {
     }
   }
 
-  await mkdir("data", {
+  await mkdir("docs/data", {
     recursive: true
   });
 
   await writeFile(
-    "data/tcg-prices.json",
+    "docs/data/tcg-prices.json",
     JSON.stringify(output, null, 2),
     "utf8"
   );
