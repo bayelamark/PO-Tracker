@@ -180,13 +180,36 @@ function getMarketPrice(card) {
     return undefined;
   }
 
-  const priceTypes = Object.values(prices);
+  const preferredFinishes = [
+    prices.holofoil,
+    prices.normal,
+    prices.reverseHolofoil,
+    prices["1stEditionHolofoil"],
+    prices["1stEditionNormal"]
+  ].filter(Boolean);
 
-  const marketPrice = priceTypes.find(function (priceType) {
-    return typeof priceType?.market === "number";
-  });
+  // First choice: market price
+  for (const finish of preferredFinishes) {
+    if (typeof finish.market === "number") {
+      return finish.market;
+    }
+  }
 
-  return marketPrice?.market;
+  // Second choice: TCGplayer Direct price
+  for (const finish of preferredFinishes) {
+    if (typeof finish.directLow === "number") {
+      return finish.directLow;
+    }
+  }
+
+  // Third choice: lowest current listing
+  for (const finish of preferredFinishes) {
+    if (typeof finish.low === "number") {
+      return finish.low;
+    }
+  }
+
+  return undefined;
 }
 
 function getAvailableFinishes(card) {
