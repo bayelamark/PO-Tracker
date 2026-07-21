@@ -1,7 +1,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 
 const CATEGORY_ID = 3;
-const MAX_GROUPS = 20;
+const MAX_GROUPS = 40;
+const REQUIRED_GROUP_IDS = [24688];
 const BASE_URL = "https://tcgcsv.com/tcgplayer";
 
 function delay(milliseconds) {
@@ -89,17 +90,34 @@ async function updatePrices() {
     `${BASE_URL}/${CATEGORY_ID}/groups`
   );
 
-  const newestGroups = groupsResult.results
-    .filter(function (group) {
-      return group.publishedOn;
-    })
-    .sort(function (groupA, groupB) {
-      return (
-        new Date(groupB.publishedOn).getTime() -
-        new Date(groupA.publishedOn).getTime()
-      );
-    })
-    .slice(0, MAX_GROUPS);
+ const newestGroups = [...groupsResult.results]
+  .sort(function (groupA, groupB) {
+    const dateA = new Date(
+      groupA.modifiedOn ?? groupA.publishedOn ?? 0
+    ).getTime();
+
+    const dateB = new Date(
+      groupB.modifiedOn ?? groupB.publishedOn ?? 0
+    ).getTime();
+
+    return dateB - dateA;
+  })
+  .slice(0, MAX_GROUPS);
+
+
+for (const requiredGroupId of REQUIRED_GROUP_IDS) {
+  const requiredGroup = groupsResult.results.find(function (group) {
+    return group.groupId === requiredGroupId;
+  });
+
+  const alreadyIncluded = newestGroups.some(function (group) {
+    return group.groupId === requiredGroupId;
+  });
+
+  if (requiredGroup && !alreadyIncluded) {
+    newestGroups.push(requiredGroup);
+  }
+}
 
   const output = {
     updatedAt: new Date().toISOString(),
