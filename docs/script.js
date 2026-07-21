@@ -3,8 +3,9 @@ const searchButton = document.querySelector("#searchButton");
 const cardResults = document.querySelector(".card-results");
 
 let currentCards = [];
+let tcgFallbackCards = {};
 
-loadNewCards();
+initializeApp();
 
 searchButton.addEventListener("click", searchCards);
 
@@ -13,6 +14,78 @@ searchInput.addEventListener("keydown", function (event) {
     searchCards();
   }
 });
+
+async function initializeApp() {
+  await loadTCGPriceFile();
+  await loadNewCards();
+}
+
+async function loadTCGPriceFile() {
+  try {
+    const response = await fetch("./data/tcg-prices.json", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Unable to load fallback price data.");
+    }
+
+    const result = await response.json();
+
+    tcgFallbackCards = result.cards ?? {};
+
+    console.log(
+      `Loaded ${Object.keys(tcgFallbackCards).length} fallback prices.`
+    );
+  } catch (error) {
+    console.warn("Fallback prices could not be loaded.", error);
+    tcgFallbackCards = {};
+  }
+}
+
+function cleanSetName(setName) {
+  return String(setName)
+    .replace(/^[A-Z0-9-]{2,15}:\s*/i, "")
+    .trim();
+}
+
+function normalizeText(value) {
+  return String(value)
+    .normalize("NFKD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/&/g, " and ")
+    .replace(/[^a-zA-Z0-9]+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function normalizeCardNumber(value) {
+  const cardNumber = String(value).split("/")[0].trim();
+
+  if (/^\d+$/.test(cardNumber)) {
+    return String(Number(cardNumber));
+  }
+
+  return normalizeText(cardNumber).replace(/\s/g, "");
+}
+
+function makeCardKey(setName, cardName, cardNumber) {
+  return [
+    normalizeText(cleanSetName(setName)),
+    normalizeText(cardName),
+    normalizeCardNumber(cardNumber)
+  ].join("|");
+}
+
+function getFallbackCard(card) {
+  const key = makeCardKey(
+    card.set?.name ?? "",
+    card.name ?? "",
+    card.number ?? ""
+  );
+
+  return tcgFallbackCards[key];
+}
 
 async function searchCards() {
   const cardName = searchInput.value.trim();
@@ -143,8 +216,8 @@ function displayCards(cards, searchTerm) {
 
           <p class="market-price">
             ${price !== undefined
-              ? `Market Price: $${price.toFixed(2)}`
-              : "Market Price: Not available"}
+              ? `Current Price: $${price.toFixed(2)}`
+              : "Current Price: Not available"}
           </p>
           
           <button
@@ -174,11 +247,7 @@ cardResults.innerHTML = `
 }
 
 function getMarketPrice(card) {
-  const prices = card.tcgplayer?.prices;
-
-  if (!prices) {
-    return undefined;
-  }
+  const prices = card.tcgplayer?.prices ?? {};
 
   const preferredFinishes = [
     prices.holofoil,
@@ -188,24 +257,49 @@ function getMarketPrice(card) {
     prices["1stEditionNormal"]
   ].filter(Boolean);
 
-  // First choice: market price
+  // First choice: Pokémon TCG API market price
   for (const finish of preferredFinishes) {
     if (typeof finish.market === "number") {
       return finish.market;
     }
   }
 
-  // Second choice: TCGplayer Direct price
+  // Second choice: Pokémon TCG API Direct price
   for (const finish of preferredFinishes) {
     if (typeof finish.directLow === "number") {
       return finish.directLow;
     }
   }
 
-  // Third choice: lowest current listing
+  // Third choice: Pokémon TCG API lowest listing
   for (const finish of preferredFinishes) {
     if (typeof finish.low === "number") {
       return finish.low;
+    }
+  }
+
+  // The Pokémon API had no price, so check TCGCSV.
+  const fallbackCard = getFallbackCard(card);
+  const fallbackPrices = fallbackCard?.prices ?? [];
+
+  // Fourth choice: TCGCSV market price
+  for (const finish of fallbackPrices) {
+    if (typeof finish.marketPrice === "number") {
+      return finish.marketPrice;
+    }
+  }
+
+  // Fifth choice: TCGCSV Direct price
+  for (const finish of fallbackPrices) {
+    if (typeof finish.directLowPrice === "number") {
+      return finish.directLowPrice;
+    }
+  }
+
+  // Sixth choice: TCGCSV lowest listing
+  for (const finish of fallbackPrices) {
+    if (typeof finish.lowPrice === "number") {
+      return finish.lowPrice;
     }
   }
 
