@@ -78,13 +78,42 @@ function makeCardKey(setName, cardName, cardNumber) {
 }
 
 function getFallbackCard(card) {
-  const key = makeCardKey(
+  const exactKey = makeCardKey(
     card.set?.name ?? "",
     card.name ?? "",
     card.number ?? ""
   );
 
-  return tcgFallbackCards[key];
+  const exactMatch = tcgFallbackCards[exactKey];
+
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  // If the names are formatted differently,
+  // match using the set name and card number instead.
+  const wantedSet = normalizeText(
+    cleanSetName(card.set?.name ?? "")
+  );
+
+  const wantedNumber = normalizeCardNumber(
+    card.number ?? ""
+  );
+
+  return Object.values(tcgFallbackCards).find(function (fallbackCard) {
+    const fallbackSet = normalizeText(
+      cleanSetName(fallbackCard.setName ?? "")
+    );
+
+    const fallbackNumber = normalizeCardNumber(
+      fallbackCard.number ?? ""
+    );
+
+    return (
+      fallbackSet === wantedSet &&
+      fallbackNumber === wantedNumber
+    );
+  });
 }
 
 async function searchCards() {
