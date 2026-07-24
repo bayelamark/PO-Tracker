@@ -453,7 +453,7 @@ if (existingCard) {
     rarity: selectedCard.rarity ?? "Not listed",
     number: selectedCard.number,
     setTotal: selectedCard.set.printedTotal,
-    marketPrice: getMarketPrice(selectedCard)
+    marketPrice: getMarketPrice(selectedCard),
     quantity: 1
   };
 
