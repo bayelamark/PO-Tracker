@@ -180,18 +180,24 @@ function displayCollection(cards) {
     return;
   }
   
-const totalValue = cards.reduce(function (total, card) {
-  const currentPrice = getCurrentPrice(card);
+  const totalCards = cards.reduce(function (total, card) {
+    return total + (card.quantity ?? 1);
+  }, 0);
+
+  const totalValue = cards.reduce(function (total, card) {
+    const currentPrice = getCurrentPrice(card);
+    const quantity = card.quantity ?? 1;
 
   return total + (
     typeof currentPrice === "number"
-      ? currentPrice
+      ? currentPrice * quantity
       : 0
-  );
-}, 0);
+    );
+  }, 0);
   
   const cardHTML = cards.map(function (card) {
     const currentPrice = getCurrentPrice(card);
+    const quantity = card.quantity ?? 1;
 
     return `
       <article class="card">
@@ -215,6 +221,10 @@ const totalValue = cards.reduce(function (total, card) {
 
           <p class="card-detail">
             Card Number: ${escapeHTML(card.number)}/${escapeHTML(card.setTotal)}
+          </p>
+
+          <p class="card-detail">
+            Quantity: ${quantity}
           </p>
 
           <p class="market-price">
@@ -241,7 +251,7 @@ const totalValue = cards.reduce(function (total, card) {
   <div class="collection-summary">
     <div class="summary-item">
       <span>Total Cards</span>
-      <strong>${cards.length}</strong>
+      <strong>${totalCards}</strong>
     </div>
 
     <div class="summary-item">
