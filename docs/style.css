@@ -445,3 +445,16 @@ main {
   font-size: 1rem;
   cursor: pointer;
 }
+
+.collection-tools input {
+  width: min(280px, 100%);
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.no-results {
+  margin: 30px 0;
+  text-align: center;
+}
