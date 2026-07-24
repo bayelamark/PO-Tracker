@@ -408,3 +408,18 @@ main {
 .summary-item strong {
   font-size: 1.5rem;
 }
+
+.collection-tools {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.collection-tools select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
