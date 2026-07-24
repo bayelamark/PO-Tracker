@@ -1,5 +1,7 @@
 const collectionResults = document.querySelector("#collectionResults");
 const sortCollection = document.querySelector("#sortCollection");
+const collectionSearch =
+  document.querySelector("#collectionSearch");
 
 let savedCollection =
   JSON.parse(localStorage.getItem("poTrackerCollection")) || [];
@@ -9,6 +11,12 @@ let tcgFallbackCards = {};
 initializeCollection();
 if (sortCollection) {
   sortCollection.addEventListener("change", function () {
+    displayCollection(savedCollection);
+  });
+}
+
+if (collectionSearch) {
+  collectionSearch.addEventListener("input", function () {
     displayCollection(savedCollection);
   });
 }
@@ -177,6 +185,28 @@ function updateSavedPrices() {
   }
 }
 
+function getFilteredCards(cards) {
+  const searchTerm =
+    collectionSearch?.value.trim().toLowerCase() ?? "";
+
+  if (searchTerm === "") {
+    return cards;
+  }
+
+  return cards.filter(function (card) {
+    const searchableInformation = [
+      card.name,
+      card.setName,
+      card.rarity,
+      card.number
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableInformation.includes(searchTerm);
+  });
+}
+
 function getSortedCards(cards) {
   const sortedCards = [...cards];
   const sortType = sortCollection?.value ?? "name";
@@ -238,7 +268,8 @@ function displayCollection(cards) {
     );
   }, 0);
   
-  const sortedCards = getSortedCards(cards);
+  const filteredCards = getFilteredCards(cards);
+  const sortedCards = getSortedCards(filteredCards);
 
   const cardHTML = sortedCards.map(function (card) {
     const currentPrice = getCurrentPrice(card);
@@ -325,9 +356,19 @@ function displayCollection(cards) {
 
   <h2>My Cards</h2>
 
-  <div class="card-grid">
-    ${cardHTML}
-  </div>
+  ${
+    sortedCards.length > 0
+      ? `
+        <div class="card-grid">
+          ${cardHTML}
+        </div>
+      `
+      : `
+        <p class="no-results">
+          No cards in your collection match that search.
+        </p>
+      `
+  }
 `;
 }
 
