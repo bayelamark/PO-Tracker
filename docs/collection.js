@@ -223,9 +223,27 @@ function displayCollection(cards) {
             Card Number: ${escapeHTML(card.number)}/${escapeHTML(card.setTotal)}
           </p>
 
-          <p class="card-detail">
-            Quantity: ${quantity}
-          </p>
+          <div class="quantity-controls">
+            <button
+                class="quantity-button"
+                type="button"
+                data-action="decrease"
+                data-card-id="${card.id}"
+              >
+                −
+              </button>
+
+              <span>Quantity: ${quantity}</span>
+
+              <button
+                class="quantity-button"
+                type="button"
+                data-action="increase"
+                data-card-id="${card.id}"
+              >
+                +
+              </button>
+            </div>
 
           <p class="market-price">
             ${
@@ -269,23 +287,53 @@ function displayCollection(cards) {
 }
 
 collectionResults.addEventListener("click", function (event) {
-  if (!event.target.classList.contains("remove-button")) {
+  const cardId = event.target.dataset.cardId;
+
+  if (!cardId) {
     return;
   }
 
-  const cardId = event.target.dataset.cardId;
+  if (event.target.classList.contains("quantity-button")) {
+    const selectedCard = savedCollection.find(function (card) {
+      return card.id === cardId;
+    });
 
-  savedCollection = savedCollection.filter(function (card) {
-    return card.id !== cardId;
-  });
+    if (!selectedCard) {
+      return;
+    }
 
+    const currentQuantity = selectedCard.quantity ?? 1;
+    const action = event.target.dataset.action;
+
+    if (action === "increase") {
+      selectedCard.quantity = currentQuantity + 1;
+    }
+
+    if (action === "decrease" && currentQuantity > 1) {
+      selectedCard.quantity = currentQuantity - 1;
+    }
+
+    saveAndDisplayCollection();
+    return;
+  }
+
+  if (event.target.classList.contains("remove-button")) {
+    savedCollection = savedCollection.filter(function (card) {
+      return card.id !== cardId;
+    });
+
+    saveAndDisplayCollection();
+  }
+});
+
+function saveAndDisplayCollection() {
   localStorage.setItem(
     "poTrackerCollection",
     JSON.stringify(savedCollection)
   );
 
   displayCollection(savedCollection);
-});
+}
 
 function escapeHTML(value) {
   const characters = {
