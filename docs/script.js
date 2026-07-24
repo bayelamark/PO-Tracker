@@ -426,15 +426,25 @@ function addToCollection(cardId, button) {
   const savedCollection =
     JSON.parse(localStorage.getItem("poTrackerCollection")) || [];
 
-  const alreadySaved = savedCollection.some(function (card) {
-    return card.id === selectedCard.id;
-  });
+  const existingCard = savedCollection.find(function (card) {
+  return card.id === selectedCard.id;
+});
 
-  if (alreadySaved) {
-    button.textContent = "Already in Collection";
-    return;
-  }
+if (existingCard) {
+  existingCard.quantity = (existingCard.quantity ?? 1) + 1;
 
+  existingCard.marketPrice = getMarketPrice(selectedCard);
+
+  localStorage.setItem(
+    "poTrackerCollection",
+    JSON.stringify(savedCollection)
+  );
+
+  button.textContent = `Added (${existingCard.quantity})`;
+
+  return;
+}
+  
   const cardToSave = {
     id: selectedCard.id,
     name: selectedCard.name,
@@ -444,6 +454,7 @@ function addToCollection(cardId, button) {
     number: selectedCard.number,
     setTotal: selectedCard.set.printedTotal,
     marketPrice: getMarketPrice(selectedCard)
+    quantity: 1
   };
 
   savedCollection.push(cardToSave);
@@ -453,6 +464,5 @@ function addToCollection(cardId, button) {
     JSON.stringify(savedCollection)
   );
 
-  button.textContent = "Added to Collection";
-  button.disabled = true;
+  button.textContent = "Added (1)";
 }
