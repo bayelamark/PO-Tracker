@@ -163,26 +163,13 @@ function getCurrentPrice(card) {
 }
 
 function updateSavedPrices() {
-  let pricesChanged = false;
-
   savedCollection.forEach(function (card) {
     const updatedPrice = getFallbackPrice(card);
 
-    if (
-      typeof updatedPrice === "number" &&
-      card.marketPrice !== updatedPrice
-    ) {
+    if (typeof updatedPrice === "number") {
       card.marketPrice = updatedPrice;
-      pricesChanged = true;
     }
   });
-
-  if (pricesChanged) {
-    localStorage.setItem(
-      "poTrackerCollection",
-      JSON.stringify(savedCollection)
-    );
-  }
 }
 
 function getFilteredCards(cards) {
@@ -372,54 +359,97 @@ function displayCollection(cards) {
 `;
 }
 
-collectionResults.addEventListener("click", function (event) {
+collectionResults.addEventListener("click", async function (event) {
   const cardId = event.target.dataset.cardId;
 
   if (!cardId) {
     return;
   }
 
-  if (event.target.classList.contains("quantity-button")) {
-    const selectedCard = savedCollection.find(function (card) {
-      return card.id === cardId;
-    });
+  const selectedCard = savedCollection.find(function (card) {
+    return card.id === cardId;
+  });
 
-    if (!selectedCard) {
-      return;
-    }
-
-    const currentQuantity = selectedCard.quantity ?? 1;
-    const action = event.target.dataset.action;
-
-    if (action === "increase") {
-      selectedCard.quantity = currentQuantity + 1;
-    }
-
-    if (action === "decrease" && currentQuantity > 1) {
-      selectedCard.quantity = currentQuantity - 1;
-    }
-
-    saveAndDisplayCollection();
+  if (!selectedCard) {
     return;
   }
 
-  if (event.target.classList.contains("remove-button")) {
-    savedCollection = savedCollection.filter(function (card) {
-      return card.id !== cardId;
-    });
+  event.target.disabled = true;
 
-    saveAndDisplayCollection();
+  try {
+    if (event.target.classList.contains("quantity-button")) {
+      const currentQuantity = selectedCard.quantity ?? 1;
+      const action = event.target.dataset.action;
+
+      let newQuantity = currentQuantity;
+
+      if (action === "increase") {
+        newQuantity = currentQuantity + 1;
+      }
+
+      if (action === "decrease") {
+        if (currentQuantity <= 1) {
+          return;
+        }
+
+        newQuantity = currentQuantity - 1;
+      }
+
+      const response = await fetch(
+        `${API_URL}/${encodeURIComponent(cardId)}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            quantity: newQuantity
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Unable to update quantity."
+        );
+      }
+
+      selectedCard.quantity = result.quantity;
+      displayCollection(savedCollection);
+      return;
+    }
+
+    if (event.target.classList.contains("remove-button")) {
+      const response = await fetch(
+        `${API_URL}/${encodeURIComponent(cardId)}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Unable to remove the card."
+        );
+      }
+
+      savedCollection = savedCollection.filter(function (card) {
+        return card.id !== cardId;
+      });
+
+      displayCollection(savedCollection);
+    }
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  } finally {
+    event.target.disabled = false;
   }
 });
-
-function saveAndDisplayCollection() {
-  localStorage.setItem(
-    "poTrackerCollection",
-    JSON.stringify(savedCollection)
-  );
-
-  displayCollection(savedCollection);
-}
 
 function escapeHTML(value) {
   const characters = {

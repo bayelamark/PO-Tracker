@@ -2,6 +2,9 @@ const searchInput = document.querySelector("#searchInput");
 const searchButton = document.querySelector("#searchButton");
 const cardResults = document.querySelector(".card-results");
 
+const API_URL =
+  "https://po-tracker-d17j.onrender.com/api/cards";
+
 let currentCards = [];
 let tcgFallbackCards = {};
 
@@ -414,7 +417,7 @@ cardResults.addEventListener("click", function (event) {
   addToCollection(cardId, event.target);
 });
 
-function addToCollection(cardId, button) {
+async function addToCollection(cardId, button) {
   const selectedCard = currentCards.find(function (card) {
     return card.id === cardId;
   });
@@ -423,30 +426,8 @@ function addToCollection(cardId, button) {
     return;
   }
 
-  const savedCollection =
-    JSON.parse(localStorage.getItem("poTrackerCollection")) || [];
-
-  const existingCard = savedCollection.find(function (card) {
-  return card.id === selectedCard.id;
-});
-
-if (existingCard) {
-  existingCard.quantity = (existingCard.quantity ?? 1) + 1;
-
-  existingCard.marketPrice = getMarketPrice(selectedCard);
-
-  localStorage.setItem(
-    "poTrackerCollection",
-    JSON.stringify(savedCollection)
-  );
-
-  button.textContent = `Added (${existingCard.quantity})`;
-
-  return;
-}
-  
   const cardToSave = {
-    id: selectedCard.id,
+    cardId: selectedCard.id,
     name: selectedCard.name,
     image: selectedCard.images.small,
     setName: selectedCard.set.name,
@@ -457,12 +438,31 @@ if (existingCard) {
     quantity: 1
   };
 
-  savedCollection.push(cardToSave);
+  button.disabled = true;
+  button.textContent = "Saving...";
 
-  localStorage.setItem(
-    "poTrackerCollection",
-    JSON.stringify(savedCollection)
-  );
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(cardToSave)
+    });
 
-  button.textContent = "Added (1)";
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || "Unable to save the card."
+      );
+    }
+
+    button.textContent = `Added (${result.quantity})`;
+  } catch (error) {
+    console.error(error);
+    button.textContent = "Try Again";
+  } finally {
+    button.disabled = false;
+  }
 }
