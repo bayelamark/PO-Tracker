@@ -26,11 +26,22 @@
     <h1>My Collection</h1>
     <p>Your saved Pokémon cards will appear below.</p>
 
+    <div class="collection-tools">
+      <label for="sortCollection">Sort by:</label>
+
+      <select id="sortCollection">
+        <option value="name">Name: A–Z</option>
+        <option value="set">Set: A–Z</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="price-low">Price: Low to High</option>
+      </select>
+    </div>
+    
     <section class="card-results" id="collectionResults">
       <p>Loading collection...</p>
     </section>
   </main>
 
-  <script src="collection.js"></script>
+  <script src="collection.js?v=6"></script>
 </body>
 </html>
