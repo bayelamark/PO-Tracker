@@ -1,4 +1,5 @@
 const collectionResults = document.querySelector("#collectionResults");
+const sortCollection = document.querySelector("#sortCollection");
 
 let savedCollection =
   JSON.parse(localStorage.getItem("poTrackerCollection")) || [];
@@ -6,6 +7,9 @@ let savedCollection =
 let tcgFallbackCards = {};
 
 initializeCollection();
+sortCollection.addEventListener("change", function () {
+  displayCollection(savedCollection);
+});
 
 async function initializeCollection() {
   await loadTCGPriceFile();
@@ -171,6 +175,43 @@ function updateSavedPrices() {
   }
 }
 
+function getSortedCards(cards) {
+  const sortedCards = [...cards];
+  const sortType = sortCollection.value;
+
+  if (sortType === "name") {
+    sortedCards.sort(function (cardA, cardB) {
+      return cardA.name.localeCompare(cardB.name);
+    });
+  }
+
+  if (sortType === "set") {
+    sortedCards.sort(function (cardA, cardB) {
+      return cardA.setName.localeCompare(cardB.setName);
+    });
+  }
+
+  if (sortType === "price-high") {
+    sortedCards.sort(function (cardA, cardB) {
+      const priceA = getCurrentPrice(cardA) ?? 0;
+      const priceB = getCurrentPrice(cardB) ?? 0;
+
+      return priceB - priceA;
+    });
+  }
+
+  if (sortType === "price-low") {
+    sortedCards.sort(function (cardA, cardB) {
+      const priceA = getCurrentPrice(cardA) ?? Number.MAX_VALUE;
+      const priceB = getCurrentPrice(cardB) ?? Number.MAX_VALUE;
+
+      return priceA - priceB;
+    });
+  }
+
+  return sortedCards;
+}
+
 function displayCollection(cards) {
   if (cards.length === 0) {
     collectionResults.innerHTML = `
@@ -195,7 +236,9 @@ function displayCollection(cards) {
     );
   }, 0);
   
-  const cardHTML = cards.map(function (card) {
+  const sortedCards = getSortedCards(cards);
+
+  const cardHTML = sortedCards.map(function (card) {
     const currentPrice = getCurrentPrice(card);
     const quantity = card.quantity ?? 1;
 
