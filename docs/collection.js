@@ -7,9 +7,11 @@ let savedCollection =
 let tcgFallbackCards = {};
 
 initializeCollection();
-sortCollection.addEventListener("change", function () {
-  displayCollection(savedCollection);
-});
+if (sortCollection) {
+  sortCollection.addEventListener("change", function () {
+    displayCollection(savedCollection);
+  });
+}
 
 async function initializeCollection() {
   await loadTCGPriceFile();
@@ -177,7 +179,7 @@ function updateSavedPrices() {
 
 function getSortedCards(cards) {
   const sortedCards = [...cards];
-  const sortType = sortCollection.value;
+  const sortType = sortCollection?.value ?? "name";
 
   if (sortType === "name") {
     sortedCards.sort(function (cardA, cardB) {
