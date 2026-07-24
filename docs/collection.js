@@ -3,8 +3,10 @@ const sortCollection = document.querySelector("#sortCollection");
 const collectionSearch =
   document.querySelector("#collectionSearch");
 
-let savedCollection =
-  JSON.parse(localStorage.getItem("poTrackerCollection")) || [];
+const API_URL =
+  "https://po-tracker-d17j.onrender.com/api/cards";
+
+let savedCollection = [];
 
 let tcgFallbackCards = {};
 
@@ -23,8 +25,54 @@ if (collectionSearch) {
 
 async function initializeCollection() {
   await loadTCGPriceFile();
+
+  const collectionLoaded = await loadSavedCollection();
+
+  if (!collectionLoaded) {
+    return;
+  }
+
   updateSavedPrices();
   displayCollection(savedCollection);
+}
+
+async function loadSavedCollection() {
+  try {
+    const response = await fetch(API_URL, {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Unable to load your collection.");
+    }
+
+    const cards = await response.json();
+
+    savedCollection = cards.map(function (card) {
+      return {
+        id: card.cardId,
+        name: card.name,
+        image: card.image,
+        setName: card.setName,
+        rarity: card.rarity,
+        number: card.number,
+        setTotal: card.setTotal,
+        marketPrice: card.marketPrice,
+        quantity: card.quantity
+      };
+    });
+
+    return true;
+  } catch (error) {
+    console.error(error);
+
+    collectionResults.innerHTML = `
+      <h2>Unable to Load Collection</h2>
+      <p>Please try refreshing the page.</p>
+    `;
+
+    return false;
+  }
 }
 
 async function loadTCGPriceFile() {
