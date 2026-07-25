@@ -8,7 +8,9 @@ const API_URL =
 let currentCards = [];
 let tcgFallbackCards = {};
 
-initializeApp();
+if (requireLogin()) {
+  initializeApp();
+}
 
 searchButton.addEventListener("click", searchCards);
 
@@ -444,9 +446,7 @@ async function addToCollection(cardId, button) {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(cardToSave)
     });
 

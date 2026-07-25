@@ -10,7 +10,9 @@ let savedCollection = [];
 
 let tcgFallbackCards = {};
 
-initializeCollection();
+if (requireLogin()) {
+  initializeCollection();
+}
 if (sortCollection) {
   sortCollection.addEventListener("change", function () {
     displayCollection(savedCollection);
@@ -38,9 +40,10 @@ async function initializeCollection() {
 
 async function loadSavedCollection() {
   try {
-    const response = await fetch(API_URL, {
-      cache: "no-store"
-    });
+   const response = await fetch(API_URL, {
+    cache: "no-store",
+    headers: getAuthHeaders(false)
+   });
 
     if (!response.ok) {
       throw new Error("Unable to load your collection.");
@@ -447,9 +450,7 @@ collectionResults.addEventListener("click", async function (event) {
         `${API_URL}/${encodeURIComponent(cardId)}`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: getAuthHeaders(),
           body: JSON.stringify({
             quantity: newQuantity
           })
@@ -473,7 +474,8 @@ collectionResults.addEventListener("click", async function (event) {
       const response = await fetch(
         `${API_URL}/${encodeURIComponent(cardId)}`,
         {
-          method: "DELETE"
+          method: "DELETE",
+          headers: getAuthHeaders(false)
         }
       );
 

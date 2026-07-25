@@ -1,12 +1,15 @@
 const express = require("express");
 const Card = require("../models/Card");
+const protect = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Get all saved cards
+router.use(protect);
+
+// Load the logged-in user's collection
 router.get("/", async function (request, response) {
   try {
-    const userId = request.query.userId || "demo-user";
+    const userId = request.userId;
 
     const cards = await Card.find({
       userId: userId
@@ -27,7 +30,7 @@ router.get("/", async function (request, response) {
 // Add a card or increase its quantity
 router.post("/", async function (request, response) {
   try {
-    const userId = request.body.userId || "demo-user";
+    const userId = request.userId;
     const cardId = request.body.cardId;
 
     if (!cardId) {
@@ -76,9 +79,10 @@ router.post("/", async function (request, response) {
   }
 });
 
+// Update a card's quantity
 router.patch("/:cardId", async function (request, response) {
   try {
-    const userId = request.body.userId || "demo-user";
+    const userId = request.userId;
     const quantity = Number(request.body.quantity);
 
     if (!Number.isInteger(quantity) || quantity < 1) {
@@ -111,10 +115,10 @@ router.patch("/:cardId", async function (request, response) {
   }
 });
 
-
+// Remove a card
 router.delete("/:cardId", async function (request, response) {
   try {
-    const userId = request.query.userId || "demo-user";
+    const userId = request.userId;
 
     const result = await Card.deleteOne({
       userId: userId,
