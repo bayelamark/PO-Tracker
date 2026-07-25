@@ -567,3 +567,36 @@ main {
   font-size: 18px;
   overflow-wrap: anywhere;
 }
+
+/* Profile name edit form */
+
+.profile-name-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.profile-name-form label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.profile-name-form input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.profile-name-form button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#profileMessage {
+  margin: 12px 0 0;
+  text-align: center;
+}

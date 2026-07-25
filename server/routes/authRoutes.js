@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const protect = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -123,6 +124,49 @@ router.post("/login", async function (request, response) {
 
     return response.status(500).json({
       message: "Unable to log in."
+    });
+  }
+});
+// Update the logged-in user's name
+router.patch("/profile", protect, async function (request, response) {
+  try {
+    const name = request.body.name?.trim();
+
+    if (!name) {
+      return response.status(400).json({
+        message: "Name is required."
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      request.userId,
+      {
+        name: name
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!user) {
+      return response.status(404).json({
+        message: "User was not found."
+      });
+    }
+
+    response.json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error(error);
+
+    response.status(500).json({
+      message: "Unable to update the name."
     });
   }
 });

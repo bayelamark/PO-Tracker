@@ -10,7 +10,7 @@
 
   <title>Profile | PO Tracker</title>
 
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 
 <body>
@@ -45,6 +45,24 @@
       <div class="profile-detail">
         <span>Name</span>
         <strong id="profileName">Loading...</strong>
+
+        <form id="nameForm" class="profile-name-form">
+          <label for="profileNameInput">
+            Edit Name
+          </label>
+
+          <input
+            type="text"
+            id="profileNameInput"
+            required
+         >
+
+          <button type="submit">
+            Save Name
+          </button>
+       </form>
+
+        <p id="profileMessage"></p>
       </div>
 
       <div class="profile-detail">
@@ -55,6 +73,6 @@
   </main>
 
   <script src="auth.js?v=2"></script>
-  <script src="profile.js?v=1"></script>
+  <script src="profile.js?v=2"></script>
 </body>
 </html>
