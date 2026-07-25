@@ -7,9 +7,7 @@ const loginMessage = document.querySelector("#loginMessage");
 const registerMessage =
   document.querySelector("#registerMessage");
 
-if (getAuthToken()) {
-  window.location.href = "index.html";
-}
+
 
 loginForm.addEventListener("submit", async function (event) {
   event.preventDefault();
