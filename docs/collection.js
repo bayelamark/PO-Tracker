@@ -2,6 +2,7 @@ const collectionResults = document.querySelector("#collectionResults");
 const sortCollection = document.querySelector("#sortCollection");
 const collectionSearch =
   document.querySelector("#collectionSearch");
+const logoutButton = document.querySelector("#logoutButton");
 
 const API_URL =
   "https://po-tracker-d17j.onrender.com/api/cards";
@@ -512,5 +513,11 @@ function escapeHTML(value) {
 
   return String(value).replace(/[&<>"']/g, function (character) {
     return characters[character];
+  });
+}
+
+if (logoutButton) {
+  logoutButton.addEventListener("click", function () {
+    logout();
   });
 }
