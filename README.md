@@ -11,17 +11,19 @@ PO Tracker is a web application that allows users to search for Pokémon cards, 
 - Search for Pokémon cards by name
 - View card images and information
 - Display current market prices
-- Add cards to a personal watchlist
-- Remove cards from the watchlist
+- Add cards to a personal collection
+- Remove cards from the collection
 - Store user and card information with MongoDB
 
 ## Technologies
 
-- React
-- Node.js
-- Express.js
+- JavaScript
+- CSS
+- HTML
 - MongoDB
 - Pokémon TCG API
+- Render
+- Adobe Illustrator
 
 ## Project Status
 
