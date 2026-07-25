@@ -2,34 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Profile | PO Tracker</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 
 <body>
   <header>
-    <img
-      src="PO-Tracker-White.png"
-      alt="PO Tracker logo"
-      class="logo"
-    >
+    <a href="index.html">
+      <img
+        src="PO-Tracker-White.png"
+        alt="PO Tracker"
+        class="logo"
+      >
+    </a>
 
     <nav class="main-nav">
       <a href="index.html">My Collection</a>
       <a href="search.html">Search</a>
       <a href="profile.html">Profile</a>
+
+      <button
+        type="button"
+        id="logoutButton"
+        class="logout-button"
+      >
+        Log Out
+      </button>
     </nav>
   </header>
 
-  <main>
-    <h1>Profile</h1>
-    <p>Account information and settings will appear here.</p>
+  <main class="profile-page">
+    <section class="profile-card">
+      <h1>My Profile</h1>
 
-    <section class="profile-box">
-      <h2>PO Tracker Account</h2>
-      <p>Login and account creation will be added when MongoDB is connected.</p>
+      <div class="profile-detail">
+        <span>Name</span>
+        <strong id="profileName">Loading...</strong>
+      </div>
+
+      <div class="profile-detail">
+        <span>Email</span>
+        <strong id="profileEmail">Loading...</strong>
+      </div>
     </section>
   </main>
+
+  <script src="auth.js?v=2"></script>
+  <script src="profile.js?v=1"></script>
 </body>
 </html>
