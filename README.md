@@ -26,3 +26,4 @@ PO Tracker is a web application that allows users to search for Pokémon cards, 
 ## Project Status
 
 This project is currently in development as my senior project.
+I hope you enjoy - Baye LaMark
